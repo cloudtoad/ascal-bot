@@ -24,6 +24,18 @@ class YearCalendar:
 
 
 @dataclass
+class MoonInfo:
+    phase_name: str
+    illumination: float
+    next_new: datetime
+    next_first_quarter: datetime
+    next_full: datetime
+    next_last_quarter: datetime
+    days_to_new: int
+    days_to_full: int
+
+
+@dataclass
 class TideInfo:
     name: str
     starts: time
@@ -39,5 +51,7 @@ class AngloSaxonDate:
     after_sunset: bool
     sunset_time: time
     sunrise_time: time
+    first_light: time
+    last_light: time
     current_tide: TideInfo
     year_calendar: YearCalendar

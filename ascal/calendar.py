@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 import ephem
 
-from ascal.types import AngloSaxonDate, MonthInfo, TideInfo, YearCalendar
+from ascal.types import AngloSaxonDate, MonthInfo, MoonInfo, TideInfo, YearCalendar
 
 # 13-month (intercalary / three-Liða) year
 ALL_MONTH_NAMES = [
@@ -212,6 +212,22 @@ class AngloSaxonCalendar:
         aware = utc_dt.replace(tzinfo=ZoneInfo("UTC")).astimezone(self.tz)
         return aware.time()
 
+    def get_twilight_times(self, d: date) -> tuple[time, time]:
+        """Return (first_light, last_light) civil twilight times for a date.
+
+        Civil twilight: sun center is 6° below the horizon.
+        """
+        obs = self._make_observer()
+        obs.horizon = "-6"
+        obs.date = datetime(d.year, d.month, d.day, 0, 0, 0)
+        sun = ephem.Sun(obs)
+        first = self._ephem_to_datetime(obs.next_rising(sun))
+        last = self._ephem_to_datetime(obs.next_setting(sun))
+        utc = ZoneInfo("UTC")
+        first_local = first.replace(tzinfo=utc).astimezone(self.tz).time()
+        last_local = last.replace(tzinfo=utc).astimezone(self.tz).time()
+        return first_local, last_local
+
     @staticmethod
     def _time_to_seconds(t: time) -> float:
         return t.hour * 3600 + t.minute * 60 + t.second
@@ -306,6 +322,75 @@ class AngloSaxonCalendar:
         return tides[0]
 
     # ------------------------------------------------------------------
+    # Moon
+    # ------------------------------------------------------------------
+
+    def get_moon_info(self, now: datetime | None = None) -> MoonInfo:
+        """Return current moon phase, illumination, and upcoming phase dates."""
+        if now is None:
+            now = datetime.now(self.tz)
+
+        m = ephem.Moon()
+        obs = self._make_observer()
+        obs.date = ephem.Date(now.astimezone(ZoneInfo("UTC")))
+        m.compute(obs)
+        illum = m.phase  # 0-100
+
+        # Upcoming phases
+        next_new = self._ephem_to_datetime(ephem.next_new_moon(obs.date))
+        next_fq = self._ephem_to_datetime(ephem.next_first_quarter_moon(obs.date))
+        next_full = self._ephem_to_datetime(ephem.next_full_moon(obs.date))
+        next_lq = self._ephem_to_datetime(ephem.next_last_quarter_moon(obs.date))
+
+        # Make aware in user's tz
+        utc = ZoneInfo("UTC")
+        next_new_local = next_new.replace(tzinfo=utc).astimezone(self.tz)
+        next_fq_local = next_fq.replace(tzinfo=utc).astimezone(self.tz)
+        next_full_local = next_full.replace(tzinfo=utc).astimezone(self.tz)
+        next_lq_local = next_lq.replace(tzinfo=utc).astimezone(self.tz)
+
+        days_to_new = (next_new_local.date() - now.date()).days
+        days_to_full = (next_full_local.date() - now.date()).days
+
+        # Determine phase name from illumination and whether waxing or waning
+        # Compare: if next full is before next new, we're waxing
+        waxing = next_full < next_new
+        if illum < 2:
+            phase_name = "New Moon"
+        elif illum > 98:
+            phase_name = "Full Moon"
+        elif 48 < illum < 52:
+            phase_name = "First Quarter" if waxing else "Last Quarter"
+        elif waxing:
+            phase_name = "Waxing Crescent" if illum < 50 else "Waxing Gibbous"
+        else:
+            phase_name = "Waning Gibbous" if illum > 50 else "Waning Crescent"
+
+        return MoonInfo(
+            phase_name=phase_name,
+            illumination=illum,
+            next_new=next_new_local,
+            next_first_quarter=next_fq_local,
+            next_full=next_full_local,
+            next_last_quarter=next_lq_local,
+            days_to_new=days_to_new,
+            days_to_full=days_to_full,
+        )
+
+    # ------------------------------------------------------------------
+    # Date conversion
+    # ------------------------------------------------------------------
+
+    def get_date(self, d: date) -> AngloSaxonDate:
+        """Return the Anglo-Saxon date for an arbitrary Gregorian date.
+
+        Uses solar noon as the time, so the result reflects the daytime
+        portion of that Gregorian date (before sunset).
+        """
+        noon = datetime(d.year, d.month, d.day, 12, 0, 0, tzinfo=self.tz)
+        return self.get_today(now=noon)
+
+    # ------------------------------------------------------------------
     # High-level queries
     # ------------------------------------------------------------------
 
@@ -347,6 +432,7 @@ class AngloSaxonCalendar:
         today = now.date()
         sunset = obs.get_sunset_time(today)
         sunrise = obs.get_sunrise_time(today)
+        first_light, last_light = obs.get_twilight_times(today)
         after_sunset = now.time() >= sunset
         tide = obs.get_current_tide(now)
 
@@ -365,6 +451,8 @@ class AngloSaxonCalendar:
             after_sunset=after_sunset,
             sunset_time=sunset,
             sunrise_time=sunrise,
+            first_light=first_light,
+            last_light=last_light,
             current_tide=tide,
             year_calendar=cal,
         )

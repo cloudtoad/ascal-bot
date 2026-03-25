@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from ascal.types import AngloSaxonDate, TideInfo, YearCalendar
+from ascal.eclipses import EclipseInfo
+from ascal.types import AngloSaxonDate, MoonInfo, TideInfo, YearCalendar
 
 
 def format_today(asd: AngloSaxonDate, timezone: str) -> str:
@@ -16,7 +17,10 @@ def format_today(asd: AngloSaxonDate, timezone: str) -> str:
         f"Modern date: {asd.gregorian.strftime('%A, %d %B %Y')}",
         f"Local time: {now.strftime('%H:%M')} ({timezone})",
         f"Current tide: **{tide.name}** ({tide.starts.strftime('%H:%M')}\u2013{tide.ends.strftime('%H:%M')})",
-        f"Sunrise: {asd.sunrise_time.strftime('%H:%M')} / Sunset: {asd.sunset_time.strftime('%H:%M')}",
+        f"First light: {asd.first_light.strftime('%H:%M')}",
+        f"Sunrise: {asd.sunrise_time.strftime('%H:%M')}",
+        f"Sunset: {asd.sunset_time.strftime('%H:%M')}",
+        f"Last light: {asd.last_light.strftime('%H:%M')}",
     ]
 
     if asd.after_sunset:
@@ -25,6 +29,19 @@ def format_today(asd: AngloSaxonDate, timezone: str) -> str:
             f"*It is now night \u2014 the Anglo-Saxon day has turned to {asd.weekday_oe}.*"
         )
 
+    return "\n".join(lines)
+
+
+def format_tomorrow(asd: AngloSaxonDate) -> str:
+    lines = [
+        f"**Morgen: {asd.weekday_oe}, day {asd.day_number} of {asd.month_name}**",
+        "",
+        f"Modern date: {asd.gregorian.strftime('%A, %d %B %Y')}",
+        f"First light: {asd.first_light.strftime('%H:%M')}",
+        f"Sunrise: {asd.sunrise_time.strftime('%H:%M')}",
+        f"Sunset: {asd.sunset_time.strftime('%H:%M')}",
+        f"Last light: {asd.last_light.strftime('%H:%M')}",
+    ]
     return "\n".join(lines)
 
 
@@ -78,14 +95,56 @@ def format_tides(tides: list[TideInfo], current_tide: TideInfo, label: str) -> s
     return "\n".join(lines)
 
 
+def format_moon(moon: MoonInfo) -> str:
+    lines = [
+        f"**{moon.phase_name}** ({moon.illumination:.1f}% illuminated)",
+        "",
+        f"Next New Moon: {moon.next_new.strftime('%a %d %b %H:%M')} ({moon.days_to_new}d)",
+        f"Next First Quarter: {moon.next_first_quarter.strftime('%a %d %b %H:%M')}",
+        f"Next Full Moon: {moon.next_full.strftime('%a %d %b %H:%M')} ({moon.days_to_full}d)",
+        f"Next Last Quarter: {moon.next_last_quarter.strftime('%a %d %b %H:%M')}",
+    ]
+    return "\n".join(lines)
+
+
+def format_as_date(asd: AngloSaxonDate) -> str:
+    """Format an AS date for the !date conversion command."""
+    lines = [
+        f"**{asd.gregorian.strftime('%A, %d %B %Y')}**",
+        "",
+        f"{asd.weekday_oe}, day {asd.day_number} of {asd.month_name}",
+        f"First light: {asd.first_light.strftime('%H:%M')}",
+        f"Sunrise: {asd.sunrise_time.strftime('%H:%M')}",
+        f"Sunset: {asd.sunset_time.strftime('%H:%M')}",
+        f"Last light: {asd.last_light.strftime('%H:%M')}",
+    ]
+    return "\n".join(lines)
+
+
+def format_eclipses(eclipses: list[EclipseInfo]) -> str:
+    if not eclipses:
+        return "No upcoming eclipses found."
+    lines = ["**Upcoming Eclipses**", ""]
+    for e in eclipses:
+        blood = " (Blood Moon)" if e.type == "lunar" and e.kind == "Total" else ""
+        lines.append(
+            f"{e.peak_local.strftime('%a %d %b %Y %H:%M')} — {e.description}{blood}"
+        )
+    return "\n".join(lines)
+
+
 def format_help(prefix: str) -> str:
     return (
         f"**Anglo-Saxon Calendar Bot**\n\n"
         f"`{prefix}today` — Today's Anglo-Saxon date\n"
+        f"`{prefix}tomorrow` — Tomorrow's AS date and sun times (also `{prefix}morgen`)\n"
         f"`{prefix}nextmonth` — When the next AS month begins\n"
         f"`{prefix}calendar` — Full month table for the current AS year\n"
         f"`{prefix}tides` — All 8 tides for the current AS day\n"
         f"`{prefix}nexttides` — All 8 tides starting from the upcoming sunset\n"
+        f"`{prefix}moon` — Current moon phase and upcoming phases\n"
+        f"`{prefix}date YYYY-MM-DD` — Convert a Gregorian date to AS\n"
+        f"`{prefix}eclipses` — Upcoming lunar and solar eclipses\n"
         f"`{prefix}holidays` — The four major holidays\n"
         f"`{prefix}location City, State` — Set your location for local sunrise/sunset/tides\n"
         f"`{prefix}location` — Show your current location\n"

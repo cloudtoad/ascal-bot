@@ -8,13 +8,18 @@ from ascal.calendar import AngloSaxonCalendar
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from ascal.eclipses import get_upcoming_eclipses
 from bot.formatting import (
+    format_as_date,
     format_calendar,
+    format_eclipses,
     format_help,
     format_holidays,
+    format_moon,
     format_next_month,
     format_tides,
     format_today,
+    format_tomorrow,
 )
 from bot.user_settings import geocode_location, get_user_location, set_user_location
 
@@ -105,6 +110,18 @@ def run_bot(config: dict) -> None:
                 asd = default_cal.get_today(local_observer=obs)
                 await bot.api.send_markdown_message(room.room_id, format_today(asd, tz))
 
+            elif cmd == "tomorrow" or cmd == "morgen":
+                obs, tz = _get_local_observer(sender)
+                local_cal = obs or default_cal
+                tomorrow = datetime.now(ZoneInfo(tz)).date() + timedelta(days=1)
+                asd = default_cal.get_date(tomorrow)
+                # Recompute with local observer's twilight
+                if obs:
+                    asd.sunrise_time = obs.get_sunrise_time(tomorrow)
+                    asd.sunset_time = obs.get_sunset_time(tomorrow)
+                    asd.first_light, asd.last_light = obs.get_twilight_times(tomorrow)
+                await bot.api.send_markdown_message(room.room_id, format_tomorrow(asd))
+
             elif cmd == "nextmonth":
                 name, begins = default_cal.get_next_month()
                 await bot.api.send_markdown_message(
@@ -148,6 +165,41 @@ def run_bot(config: dict) -> None:
                     room.room_id,
                     format_tides(tides, current, f"Tides starting next sunset ({tz})"),
                 )
+
+            elif cmd == "moon":
+                obs, tz = _get_local_observer(sender)
+                cal = obs or default_cal
+                moon = cal.get_moon_info()
+                await bot.api.send_markdown_message(room.room_id, format_moon(moon))
+
+            elif cmd == "eclipses":
+                obs, tz = _get_local_observer(sender)
+                cal = obs or default_cal
+                eclipses = get_upcoming_eclipses(
+                    ZoneInfo(tz),
+                    float(cal.latitude),
+                    float(cal.longitude),
+                )
+                await bot.api.send_markdown_message(room.room_id, format_eclipses(eclipses))
+
+            elif cmd == "date":
+                args = match.args()
+                if not args:
+                    await bot.api.send_markdown_message(
+                        room.room_id, f"Usage: `{prefix}date YYYY-MM-DD`",
+                    )
+                    return
+                try:
+                    from datetime import date as date_cls
+                    d = date_cls.fromisoformat(args[0])
+                except ValueError:
+                    await bot.api.send_markdown_message(
+                        room.room_id, f"Invalid date format. Use `{prefix}date YYYY-MM-DD`.",
+                    )
+                    return
+                obs, tz = _get_local_observer(sender)
+                asd = default_cal.get_date(d)
+                await bot.api.send_markdown_message(room.room_id, format_as_date(asd))
 
             elif cmd == "holidays":
                 asd = default_cal.get_today()
