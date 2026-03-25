@@ -121,3 +121,45 @@ Bede's finger-counting system (De Temporum Ratione ch. 1) allowed a person to re
 The 19-year Metonic cycle — that 235 lunar months almost exactly equal 19 solar years — was known to Bede, embedded in Scandinavian primstav calendar sticks, and used by Icelandic law-speakers to maintain the legal calendar. It is the mathematical foundation underlying all medieval lunisolar calendars.
 ---
 Byrhtferth of Ramsey's famous diagram (c. 1011) maps the four elements, four humors, four seasons, twelve months, zodiac signs, solstices, equinoxes, and the ages of man into a single integrated cosmological figure — a visual representation of how medieval scholars understood time, nature, and the heavens as a unified system.
+---
+March had two Old English names: Hreðmōnaþ (month of the goddess Hreða) and Hlyda ("the loud one"), referring to the roaring March winds. Hlyda comes from OE hlydan, "to make noise." It survived in the English west country as "Lide" into the 19th century.
+---
+August had two Old English names: Weodmōnaþ ("weed month," per Bede) and Rugern ("rye harvest"), attested in the Laws of the Kentish King Wihtred (c. 695). Rugern is connected to OE ryge (rye) and may have been brought from the continent by the settlers.
+---
+September was originally Hāliġmōnaþ ("holy month" — a month of sacred rites, per Bede), but was later replaced by Hærfestmōnaþ ("harvest month"). The newer name survived the Norman Conquest and was still in use as late as 1826.
+---
+The word "undern" underwent one of the most remarkable semantic shifts in English. It originally meant "9 AM" (the third hour), then drifted to "midday," then to "afternoon." The same shift happened in parallel across every Germanic language where the word survives — Old Frisian, Old Saxon, Old High German, and Old Norse all show undern moving from morning to afternoon.
+---
+The word "noon" comes from Latin nona hora, "the ninth hour" — originally 3 PM. By the 12th century it had shifted to mean midday. One theory: monks kept moving the Nones prayer service earlier to break their fast sooner, dragging the word with it.
+---
+The words "moon" and "month" share the same root across all Germanic languages: Proto-Germanic menon- (moon) and menoth- (month). Ultimately from PIE meh- "to measure" — the moon as the original measure of time. Bede himself notes the connection: "the Moon is called mona and the month monath."
+---
+Old English counted years by winters, not summers: wintergetael means "number of years" (literally "winter-count"). A wintersteal was a one-year-old stallion. This reflects the primacy of winter in the Germanic two-season system that Bede describes.
+---
+Charlemagne renamed all twelve months in Frankish Germanic (recorded by Einhard, c. 830 AD). Only one name matches the Anglo-Saxon system: April as Ōstarmanoth (Easter month). Some scholars argue this was borrowed from Anglo-Saxon missionaries rather than being native Frankish.
+---
+The Old Saxon poem Heliand, retelling the Gospels in Germanic heroic verse, uses "Pascha" for Easter with no hint of Eostre or Ōstar — suggesting the continental Saxons did not share the Eostre tradition with the Anglo-Saxons and Franks.
+---
+Saturday is the anomaly in the Germanic weekday system. Three different solutions emerged: West Germanic (OE Sæternesdæg) borrowed Saturn directly from Latin. Norse invented Laugardagr ("bath day"). German split between Samstag (from Greek Sabbaton/Hebrew Shabbat) in the south and Sonnabend ("sun-eve") in the north.
+---
+Wednesday lost its pagan name in two major Germanic languages. German replaced Wuotanstag with Mittwoch ("midweek"), and Icelandic replaced Óðinsdagur with Miðvikudagur ("mid-week-day") — both likely under Christian pressure to suppress the god's name.
+---
+Tuesday is named for Tīw (OE) / Týr (ON) / Ziu (OHG), the sky and war god equated with Roman Mars. The name continues PIE Dyeus, the sky-father — cognate with Latin Deus, Greek Zeus, and Sanskrit Dyaus. Tīw was likely the original chief god of the Germanic peoples, later displaced by Wōden.
+---
+Friday preserves the name of the goddess Frig (OE) / Frigg (ON) / Frija (OHG), equated with Venus. The OE word Frig is cognate with Sanskrit priya, "beloved" or "wife." There is scholarly debate about whether Frigg and Freyja were originally the same goddess who split into two in the Norse tradition.
+---
+The Old English daeg-mael ("day-measure") was both the word for a sundial and for the marks scored on it. Frederick Tupper considered the term important enough to devote an entire dissertation to it: Anglo-Saxon Daeg-Mael.
+---
+OE niht-helm ("night-helmet") was a poetic kenning for darkness. The Anglo-Saxons also had uhtsang ("dawn-song") for the morning prayer service, and daeg-red ("day-redness") for the first light of dawn.
+---
+The Jera rune (ᛃ) means "year" or "harvest" and represents the cyclical passage of the seasons. The word comes from PGmc jeran, cognate with Greek hora (season/hour), which gives us the modern English word "hour."
+---
+The Gothic calendar fragment (6th century, Milan) preserves fruma Jiuleis — "first Yule" or "before Yule" — the oldest written attestation of a Yule-related word in any Germanic language. Whether jiuleis connects to the broader Yule tradition or derives from Greek Iobelaios (Jubilee) is debated.
+---
+Only two Old Saxon month names survive: Halegmanuth and Blodmanuth, attested in the 9th-10th century Essen Necrology. They correspond exactly to the Anglo-Saxon Hāliġmōnaþ (September) and Blōtmōnaþ (November), suggesting a shared tradition between the Saxons who stayed on the continent and those who crossed to Britain.
+---
+The Old Norse winter month Morsugur ("suet-sucker") gets its name from mor (suet) and sugur (sucker) — the darkest month that "sucks the fat" from people and livestock. It was also called Jólamánuður (Yule month).
+---
+The Old Icelandic winter month Þorri is of uncertain etymology — possibly from þurr (dry), þverra (to dwindle), or from the god Þórr. In Orkneyinga saga, Þorri is treated as a legendary Nordic king. The month was personified as a frost-spirit.
+---
+Bede explains that Sōlmōnaþ (February) means "month of cakes" — sol referring to the flat cakes offered to the gods. Despite appearances, it has nothing to do with the sun; the OE word has a short vowel, distinguishing it from sōl (sun).
