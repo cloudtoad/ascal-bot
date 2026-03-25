@@ -28,3 +28,9 @@ new_user_threshold = 5
 # Anthropic API key for text analysis
 anthropic_api_key = "sk-ant-..."
 
+[notifications]
+# Matrix user IDs to DM for bot alerts (errors, warnings, etc.)
+admin_users = [
+  # "@you:matrix.example.org",
+]
+

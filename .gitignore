@@ -5,6 +5,8 @@ __pycache__/
 venv/
 crypto_store/
 session.txt
+session.json
 user_settings.json
+mod_state.json
 ascal-reference/
 *.bsp

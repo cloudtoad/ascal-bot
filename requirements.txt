@@ -1,3 +1,7 @@
+matrix-nio[e2e]
+markdown
 pyephem
-simplematrixbotlib
+astronomy-engine
+geopy
+timezonefinder
 anthropic
