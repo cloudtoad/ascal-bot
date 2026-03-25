@@ -1,0 +1,13 @@
+[matrix]
+homeserver = "https://matrix.example.org"
+username = "calendar_bot"
+password = "secret"  # or set MATRIX_PASSWORD env var
+# access_token = "syt_..."  # use instead of password for SSO accounts; or set MATRIX_ACCESS_TOKEN env var
+
+[calendar]
+latitude = "52.634289"
+longitude = "-1.690710"
+timezone = "Europe/London"
+
+[bot]
+prefix = "!"

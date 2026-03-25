@@ -1,0 +1,169 @@
+from __future__ import annotations
+
+import logging
+
+import simplematrixbotlib as botlib
+
+from ascal.calendar import AngloSaxonCalendar
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+from bot.formatting import (
+    format_calendar,
+    format_help,
+    format_holidays,
+    format_next_month,
+    format_tides,
+    format_today,
+)
+from bot.user_settings import geocode_location, get_user_location, set_user_location
+
+log = logging.getLogger(__name__)
+
+
+def run_bot(config: dict) -> None:
+    mc = config["matrix"]
+    cc = config["calendar"]
+    bc = config.get("bot", {})
+    prefix = bc.get("prefix", "!")
+
+    if mc.get("access_token"):
+        creds = botlib.Creds(mc["homeserver"], mc["username"], access_token=mc["access_token"])
+    else:
+        creds = botlib.Creds(mc["homeserver"], mc["username"], mc["password"])
+    bot_config = botlib.Config()
+    bot_config.join_on_invite = True
+    bot_config.encryption_enabled = True
+    bot_config.ignore_unverified_devices = True
+    bot_config.store_path = "./crypto_store/"
+    bot = botlib.Bot(creds, bot_config)
+
+    default_cal = AngloSaxonCalendar(
+        latitude=cc["latitude"],
+        longitude=cc["longitude"],
+        timezone=cc["timezone"],
+    )
+    log.info("Warming calendar cache...")
+    default_cal.warm_cache()
+    log.info("Cache ready.")
+
+    def _get_local_observer(user_id: str) -> tuple[AngloSaxonCalendar | None, str]:
+        """Return (local_observer, timezone) for a user.
+
+        Returns (None, default_tz) if the user has no custom location.
+        The local observer is only used for sunrise/sunset/tides — month
+        boundaries always come from default_cal.
+        """
+        loc = get_user_location(user_id)
+        if loc is None:
+            return None, cc["timezone"]
+        return AngloSaxonCalendar(
+            latitude=loc["latitude"],
+            longitude=loc["longitude"],
+            timezone=loc["timezone"],
+        ), loc["timezone"]
+
+    @bot.listener.on_message_event
+    async def on_message(room, message):
+        match = botlib.MessageMatch(room, message, bot, prefix=prefix)
+        if not (match.is_not_from_this_bot() and match.prefix()):
+            return
+
+        sender = message.sender
+        cmd = match.command()
+        try:
+            if cmd == "location":
+                place = " ".join(match.args())
+                if not place:
+                    loc = get_user_location(sender)
+                    if loc:
+                        await bot.api.send_markdown_message(
+                            room.room_id,
+                            f"Your location: {loc.get('display_name', 'unknown')} ({loc['timezone']})",
+                        )
+                    else:
+                        await bot.api.send_markdown_message(
+                            room.room_id,
+                            f"No location set. Use `{prefix}location City, State/Country` to set one.",
+                        )
+                    return
+                result = geocode_location(place)
+                if result is None:
+                    await bot.api.send_markdown_message(
+                        room.room_id, f"Could not find a location matching \"{place}\".",
+                    )
+                    return
+                display_name, lat, lon, tz = result
+                set_user_location(sender, lat, lon, tz, display_name)
+                await bot.api.send_markdown_message(
+                    room.room_id,
+                    f"Location set to **{display_name}** ({tz})",
+                )
+
+            elif cmd == "today":
+                obs, tz = _get_local_observer(sender)
+                asd = default_cal.get_today(local_observer=obs)
+                await bot.api.send_markdown_message(room.room_id, format_today(asd, tz))
+
+            elif cmd == "nextmonth":
+                name, begins = default_cal.get_next_month()
+                await bot.api.send_markdown_message(
+                    room.room_id, format_next_month(name, begins)
+                )
+
+            elif cmd == "calendar":
+                asd = default_cal.get_today()
+                await bot.api.send_markdown_message(
+                    room.room_id, format_calendar(asd.year_calendar)
+                )
+
+            elif cmd == "tides":
+                obs, tz = _get_local_observer(sender)
+                cal = obs or default_cal
+                now = datetime.now(ZoneInfo(tz))
+                sunset = cal.get_sunset_time(now.date())
+                if now.time() >= sunset:
+                    sunset_date = now.date()
+                else:
+                    sunset_date = now.date() - timedelta(days=1)
+                tides = cal.get_as_day_tides(sunset_date)
+                current = cal.get_current_tide(now)
+                await bot.api.send_markdown_message(
+                    room.room_id,
+                    format_tides(tides, current, f"Tides for the current AS day ({tz})"),
+                )
+
+            elif cmd == "nexttides":
+                obs, tz = _get_local_observer(sender)
+                cal = obs or default_cal
+                now = datetime.now(ZoneInfo(tz))
+                sunset = cal.get_sunset_time(now.date())
+                if now.time() >= sunset:
+                    sunset_date = now.date() + timedelta(days=1)
+                else:
+                    sunset_date = now.date()
+                tides = cal.get_as_day_tides(sunset_date)
+                current = cal.get_current_tide(now)
+                await bot.api.send_markdown_message(
+                    room.room_id,
+                    format_tides(tides, current, f"Tides starting next sunset ({tz})"),
+                )
+
+            elif cmd == "holidays":
+                asd = default_cal.get_today()
+                await bot.api.send_markdown_message(
+                    room.room_id, format_holidays(asd.year_calendar)
+                )
+
+            elif cmd == "help":
+                await bot.api.send_markdown_message(
+                    room.room_id, format_help(prefix)
+                )
+
+        except Exception:
+            log.exception("Error handling command %s", cmd)
+            await bot.api.send_markdown_message(
+                room.room_id, "Something went wrong processing that command."
+            )
+
+    bot.run()
