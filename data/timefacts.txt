@@ -1,0 +1,123 @@
+The Anglo-Saxons divided the day into 8 tides (tida), each covering roughly 3 hours — four for daylight and four for night. A separate system of temporal (unequal) hours, inherited from Rome, divided daylight into 12 hours that expanded and contracted with the seasons. Both systems coexisted, as shown on surviving sundials like the Bewcastle Cross.
+---
+Stjornu-Oddi ("Star-Oddi"), a 12th-century Icelandic farm laborer, produced the Oddatala — a chart of the sun's rising and setting directions through the year. His naked-eye observations, preserved in medieval manuscripts, have been verified by modern astronomers as remarkably accurate for the latitude of northern Iceland.
+---
+The Old English word for the Milky Way was Watlinga Straet (Watling Street) — the same name as the great Roman road running across England. The earthly road was seen as a reflection of the celestial path.
+---
+Tacitus wrote in Germania (ch. 11) that the Germanic peoples counted time by nights, not days: "nox ducere diem videtur" (the night seems to lead the day). This survives in the English word "fortnight" — fourteen nights.
+---
+The Anglo-Saxon day began at sunset, not midnight or sunrise. This is why Bede notes that the winter solstice celebration of Modraniht ("Mothers' Night") was the beginning of the year — the night led the day.
+---
+Any vertical object — a spear, a post, a standing stone — planted in the ground serves as a gnomon. The length and direction of its shadow indicates both the time of day and the season of the year. Byrhtferth of Ramsey described the method using a rod (baculus) in his Enchiridion (c. 1011), and the practice is implied by the Old English term "scead-mael" (shadow-measure).
+---
+The Old English words for Venus were morgensteorra (morning star) and aefensteorra (evening star). Anglo-Saxon scholars knew these were the same celestial body.
+---
+Orion's Belt was known in Scandinavian tradition as Friggerock — "Frigg's Distaff." The three belt stars represented a spinning distaff, and the sword stars below were the spindle.
+---
+The Pleiades were known across the Germanic world as "The Seven Stars" or simply Stjarna ("The Star"). In winter, their position in the night sky was used as a clock — their movement across the sky told the time.
+---
+Ursa Major was called Woden's Wain (Odin's Wagon) in Norse tradition. The four bowl stars were the wagon, the three handle stars its pole. The English name "Charles's Wain" likely derives from OE carles waen ("churl's wagon"), later folk-etymologized as referring to Charlemagne.
+---
+The Lithuanian peoples preserved pre-Christian astronomical traditions longer than any other European group, not being formally Christianized until 1387. They retained a complete set of native planet names — the only such set surviving from northern Europe.
+---
+In Baltic tradition, the Milky Way was called Pauksciu Takas — "The Way of Birds." The souls of the dead were believed to become birds and travel along it to the afterlife.
+---
+Anglo-Saxon sundials, called "tide dials," divided the daylight semicircle into 4 or 8 sections rather than 12 hours. The Kirkdale sundial (c. 1055) in Yorkshire bears the inscription "This is the day's sun-marker, at every tide."
+---
+The Bewcastle Cross in Cumbria (7th-8th century) bears one of the oldest surviving English sundials. It integrates both the native eight-tide system and the Roman twelve-hour system on a single dial face.
+---
+Bede correctly explained in De Natura Rerum (703 CE) that solar eclipses are caused by the Moon passing between Earth and the Sun, and that they cannot be seen everywhere simultaneously because of the Earth's curvature.
+---
+The Anglo-Saxon Chronicle records the total solar eclipse of 540 CE with the note that "the stars showed themselves full-nigh half an hour after nine in the forenoon" — the eclipse was so deep that stars became visible in daylight.
+---
+The Old English word for a comet was faxede steorra — "haired star." The Anglo-Saxon Chronicle records 11 comet sightings, and nine of them were interpreted as evil portents.
+---
+The Irish name for the Milky Way was Bealach na Bo Finne — "The Way of the White Cow." In Welsh it was Caer Gwydion — "Gwydion's Fortress," named for the magician-god sometimes compared to Odin.
+---
+The earliest sunset of the year occurs roughly 2-3 weeks before the winter solstice, while the latest sunrise occurs 2-3 weeks after it. The solstice itself is the shortest day, but sunset and sunrise shift on different schedules. Anyone tracking the sun against horizon landmarks — as Germanic peoples did — would have noticed that evenings start getting longer well before the solstice arrives.
+---
+In the Icelandic dagmark system, farmers noted the sun's position against local mountain peaks and landmarks to tell time. Star-Oddi's contribution was generalizing these observations into compass-direction tables that could be applied more broadly than any single farm's landmarks.
+---
+The Norse divided the horizon into eight sections called aettir, each 45 degrees wide. The sun's position within a given aett told the observer which tide of the day it was.
+---
+Educated Anglo-Saxons knew Saturn's orbital period was approximately 30 years. The modern value is 29.46 years — impressively close for knowledge transmitted through Bede and classical sources.
+---
+The Norse distinguished wandering planets from fixed stars. A 1242 text uses the term merkistjarna ("mark-star") for planets, though this may reflect Continental learning rather than a native Norse tradition.
+---
+Civil twilight — when the sun is 6 degrees below the horizon — was practically important to northern peoples. At high latitudes near the solstices, twilight can last for hours, and in Iceland near midsummer it never fully gets dark.
+---
+The Welsh encoded astronomy into the Mabinogi: Corona Borealis was called Caer Arianrhod ("Castle of the Silver Circle"), named for Arianrhod, daughter of Don. The constellation's circular shape inspired the fortress imagery. Some scholars see her as originally a sky deity, though in the Mabinogi itself she appears as a mortal woman.
+---
+Icelandic sources describe observers standing at fixed positions before their dwellings to note where the sun appeared on the horizon each day. By tracking the sun's shifting position against landmarks over time, a household could follow the progression of the seasons without any instrument.
+---
+The word "tide" itself comes from Old English tid, meaning "a portion of time." It is cognate with German Zeit (time). Our modern use of "tide" for ocean movements came later — originally it just meant a division of the day.
+---
+Aurvandil's Toe is an Old Norse star or constellation (its identification is debated — possibly Corona Borealis, Rigel, or Venus). According to the Prose Edda, Thor carried Aurvandil across the icy Elivagar rivers in a basket, but one toe stuck out and froze. Thor broke it off and threw it into the sky, where it became a star.
+---
+In Lithuanian folk astronomy, the Pleiades (Sietynas, "The Sieve") served as both a calendar and a clock. The folk saying "The Sietynas in the glow, the ox in the furrow" connected the constellation's evening heliacal setting to the start of spring ploughing.
+---
+The Coligny Calendar, a 2nd-century CE Gaulish bronze tablet, preserves a sophisticated Celtic lunisolar calendar with 62 months in a 5-year cycle, complete with intercalary months. It demonstrates that the Gauls had mastered the mathematics of lunar-solar reconciliation, though the degree of Roman or Greek influence on the system is debated.
+---
+Polaris (the North Star) was called Scipsteorra in Old English — "Ship Star" — reflecting its critical importance in maritime navigation. In Old Norse it was Leidarstjarna — "Lode Star" (guiding star).
+---
+The Latvian deity Auseklis (the Morning Star / Venus) is the third most frequently mentioned deity in Latvian folk songs. An eight-pointed star representing Auseklis became a symbol of the Latvian National Awakening in the 1980s.
+---
+Thiazi's Eyes is an Old Norse constellation identified with Castor and Pollux (the two brightest stars in Gemini). In the Prose Edda, Odin threw Thiazi's eyes into the sky after his death, though an older poem (Harbardsljod) attributes the act to Thor.
+---
+Icelandic sources describe the law speaker's seat oriented toward the sun, and some pre-Christian Norse graves were aligned north-south. Christian burials typically required east-west orientation, creating a visible archaeological boundary between the old practice and the new.
+---
+Solar noon — when the sun crosses the meridian — is not 12:00 on the clock. It shifts daily due to the equation of time and varies by longitude within a timezone. A spear-shadow at its shortest points true north (in the Northern Hemisphere) regardless of what a clock says.
+---
+Icelandic law (Gragas) legally defined when summer began: when the sun rose in the direction of "true east-northeast." The Althing was required to begin on the Thursday of the 10th week of summer. Getting the calendar wrong had legal consequences.
+---
+The Icelandic calendar year was 364 days (two half-years of 26 weeks). An intercalary week called "sumarauki" was added every 5th or 6th year to stay aligned with the solar year. The calendar reform that introduced this was proposed by Thorsteinn Surt in 955 AD, as described by Ari the Wise in Islendingabok.
+---
+Over 100 Anglo-Saxon "tide dials" survive on English church walls, mostly on south-facing walls near the priest's door. Most are simple scratch dials with a hole for a stick gnomon, dividing the daylight semicircle into 4 or 8 sections. Wear patterns show the gnomon was a removable stick, not permanent.
+---
+The Corhampton dial in Hampshire (c. 10th century) shows the four main tides scored more deeply than the intermediate lines, suggesting a practical hierarchy — some tides mattered more than others in daily life.
+---
+Byrhtferth of Ramsey wrote in his Enchiridion (c. 1011) detailed instructions for telling time by shadow measurement. He describes erecting a rod (baculus) vertically and provides tables of shadow lengths for each month and hour — a practical Anglo-Saxon field manual for timekeeping.
+---
+The Old English word "scead-mael" (shadow-measure) appears in Anglo-Saxon glosses and poetry, confirming that measuring time by shadows was a known and named practice, not just a theoretical import from Mediterranean learning.
+---
+Bede described in De Temporum Ratione how a 6-foot gnomon casts shadows of specific lengths at different seasons and hours. He adapted Mediterranean shadow-reckoning tables for the northerly latitudes of Northumbria, where the sun sits much lower in the winter sky.
+---
+In the Icelandic "dagmal" system, the morning time-marker was when the sun stood in the southeast (roughly 8:30-9 AM), and "eykt" was when it reached the southwest (roughly 3-3:30 PM). These two marks divided the working day into its main segments.
+---
+Several entries in the Landnamabok (Icelandic Book of Settlements) describe farm boundaries defined partly by where the sun appeared over specific mountains at specific seasons — using the horizon as a permanent calendar carved by the landscape itself.
+---
+Eyrbyggja Saga describes Thorolf Mostrarskegg observing where the sun set over a mountain when choosing where to build his temple. Solar observation was tied to the selection of sacred sites.
+---
+Anglo-Saxon churches were oriented not to true east but to the sunrise on the feast day of their patron saint. The variation in church orientations across England corresponds to calculated sunrise azimuths for different saints' days — evidence of deliberate horizon observation on specific dates.
+---
+Bede was one of the first European writers to describe ocean tides scientifically. In De Temporum Ratione ch. 29, he explains that tides follow the moon, arriving about 48 minutes later each day, with spring tides at new and full moon and neap tides at the quarters. He notes that every coastal location has its own characteristic delay between the moon's passage and high water.
+---
+Bede used the terms "malina" (spring tide) and "ledones" (neap tide), which he says are local vernacular terms rather than classical Latin. He also observed that the greatest spring tides of the year occur near the equinoxes — a detail that required years of coastal observation.
+---
+The Konungs skuggsja (King's Mirror, c. 1250) instructs Norwegian mariners to learn "the course of the heavens" and know the position of the stars at every hour of the night and every season. It also discusses the extreme tides around Norway and describes the Maelstrom as a tidal phenomenon.
+---
+Norse sailors practiced "latitude sailing" — sailing to the known latitude of their destination, then following that latitude east or west. This required estimating Polaris altitude above the horizon, which could be done with a simple stick held at arm's length.
+---
+The "solarsteinn" (sun-stone) appears in several saga texts. Thorkild Ramskou proposed in 1967 that it was a polarizing crystal (Iceland spar) that could locate the sun through overcast skies. Experimental work by French physicists in 2011 confirmed that calcite crystals can determine the sun's position to within a few degrees even under clouds.
+---
+The Konungs skuggsja attempted to explain the aurora borealis rationally — as reflections of sunlight from polar ice, or as fires surrounding the ocean. This was not mere superstition but an attempt at natural philosophy applied to a phenomenon unique to the far north.
+---
+Bede wrote in De Natura Rerum that a red sun at rising or setting indicates wind; a pale sun indicates rain; a halo around the moon foretells storms; and that the direction in which the halo breaks indicates the wind direction. Stars that twinkle more than usual indicate approaching wind.
+---
+Bede noted that a thin, sharp crescent moon indicates wind; a red crescent indicates rain; and a crescent with both horns blunted indicates storms. These observations, while transmitted from Pliny, were part of practical weather-reading in early medieval England.
+---
+The Old English "thunder prognostics" (found in Cotton Tiberius A.iii and other manuscripts) predict weather and harvests from which direction thunder is heard in each month. While often dismissed as superstition, they represent a coherent system of correlating celestial and atmospheric phenomena.
+---
+Norwegian runic calendar sticks (primstavar) used the 19-year Metonic cycle to track the moon's phase through the year. Each day was marked with a rune, and golden-number marks indicated new moons — embedding lunar computation into a portable wooden device that any farmer could carry.
+---
+Several Anglo-Saxon medical texts, including the Lacnunga (10th-11th century) and Bald's Leechbook, specify gathering herbs on particular numbered days of the lunar month — "when the moon is nine nights old," for example. The timing was part of the remedy itself, as specific and non-negotiable as the ingredients.
+---
+Havamal stanza 81 advises: "Praise the day in the evening" — only after you have observed its full course. This reflects a culture where the day's weather pattern was read as a unified whole, not moment by moment. The Anglo-Saxon day itself ended at sunset, so the "evening praise" was also the day's conclusion.
+---
+In Lithuanian tradition, the direction of the first spring thunder predicted the year's fortune. Thunder from the east meant a good year for grain; from the south, good for cattle. These observations were recorded by the Jesuit missionaries who encountered them still in living practice in the 16th-17th centuries.
+---
+Bede's finger-counting system (De Temporum Ratione ch. 1) allowed a person to represent any number from 1 to 9,999 using finger positions on both hands. This was a practical computational tool that enabled monks to perform complex calendar calculations without writing materials.
+---
+The 19-year Metonic cycle — that 235 lunar months almost exactly equal 19 solar years — was known to Bede, embedded in Scandinavian primstav calendar sticks, and used by Icelandic law-speakers to maintain the legal calendar. It is the mathematical foundation underlying all medieval lunisolar calendars.
+---
+Byrhtferth of Ramsey's famous diagram (c. 1011) maps the four elements, four humors, four seasons, twelve months, zodiac signs, solstices, equinoxes, and the ages of man into a single integrated cosmological figure — a visual representation of how medieval scholars understood time, nature, and the heavens as a unified system.

@@ -11,3 +11,4 @@ timezone = "Europe/London"
 
 [bot]
 prefix = "!"
+# welcome_room = "Campfire"  # room name where new joins get a welcome message

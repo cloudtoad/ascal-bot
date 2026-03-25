@@ -7,3 +7,4 @@ crypto_store/
 session.txt
 user_settings.json
 ascal-reference/
+*.bsp

@@ -6,7 +6,9 @@ from zoneinfo import ZoneInfo
 
 import ephem
 
-from ascal.types import AngloSaxonDate, MonthInfo, MoonInfo, TideInfo, YearCalendar
+import math
+
+from ascal.types import AngloSaxonDate, MonthInfo, MoonInfo, SunInfo, TideInfo, YearCalendar
 
 # 13-month (intercalary / three-Liða) year
 ALL_MONTH_NAMES = [
@@ -320,6 +322,44 @@ class AngloSaxonCalendar:
 
         # Fallback
         return tides[0]
+
+    # ------------------------------------------------------------------
+    # Sun position
+    # ------------------------------------------------------------------
+
+    _COMPASS_POINTS = [
+        "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+        "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
+    ]
+
+    def get_sun_info(self, now: datetime | None = None) -> SunInfo:
+        """Return current sun altitude, azimuth, and shadow info."""
+        if now is None:
+            now = datetime.now(self.tz)
+        obs = self._make_observer()
+        obs.date = ephem.Date(now.astimezone(ZoneInfo("UTC")))
+        sun = ephem.Sun(obs)
+        sun.compute(obs)
+
+        alt_deg = float(sun.alt) * 180 / math.pi
+        az_deg = float(sun.az) * 180 / math.pi
+
+        # Shadow points opposite to the sun's azimuth
+        shadow_az = (az_deg + 180) % 360
+        idx = int((shadow_az + 11.25) % 360 / 22.5)
+        shadow_dir = self._COMPASS_POINTS[idx]
+
+        if alt_deg > 0:
+            shadow_ratio = 1 / math.tan(math.radians(alt_deg))
+        else:
+            shadow_ratio = None
+
+        return SunInfo(
+            altitude=round(alt_deg, 1),
+            azimuth=round(az_deg, 1),
+            shadow_dir=shadow_dir,
+            shadow_ratio=round(shadow_ratio, 2) if shadow_ratio is not None else None,
+        )
 
     # ------------------------------------------------------------------
     # Moon

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import logging
+import random
+from pathlib import Path
 
 import simplematrixbotlib as botlib
+from nio.events.room_events import RoomMemberEvent
 
 from ascal.calendar import AngloSaxonCalendar
 from datetime import datetime, timedelta
@@ -17,6 +20,7 @@ from bot.formatting import (
     format_holidays,
     format_moon,
     format_next_month,
+    format_sun,
     format_tides,
     format_today,
     format_tomorrow,
@@ -42,6 +46,14 @@ def run_bot(config: dict) -> None:
     bot_config.ignore_unverified_devices = True
     bot_config.store_path = "./crypto_store/"
     bot = botlib.Bot(creds, bot_config)
+
+    # Load timefacts
+    facts_file = Path(__file__).resolve().parent.parent / "data" / "timefacts.txt"
+    if facts_file.exists():
+        timefacts = [f.strip() for f in facts_file.read_text().split("---") if f.strip()]
+    else:
+        timefacts = []
+        log.warning("timefacts.txt not found at %s", facts_file)
 
     default_cal = AngloSaxonCalendar(
         latitude=cc["latitude"],
@@ -166,6 +178,19 @@ def run_bot(config: dict) -> None:
                     format_tides(tides, current, f"Tides starting next sunset ({tz})"),
                 )
 
+            elif cmd == "sun":
+                obs, tz = _get_local_observer(sender)
+                cal = obs or default_cal
+                sun = cal.get_sun_info()
+                await bot.api.send_markdown_message(room.room_id, format_sun(sun))
+
+            elif cmd == "timefact":
+                if timefacts:
+                    fact = random.choice(timefacts)
+                    await bot.api.send_markdown_message(room.room_id, fact)
+                else:
+                    await bot.api.send_markdown_message(room.room_id, "No timefacts available.")
+
             elif cmd == "moon":
                 obs, tz = _get_local_observer(sender)
                 cal = obs or default_cal
@@ -217,5 +242,30 @@ def run_bot(config: dict) -> None:
             await bot.api.send_markdown_message(
                 room.room_id, "Something went wrong processing that command."
             )
+
+    welcome_room_name = bc.get("welcome_room")
+
+    WELCOME_MSG = (
+        "Welcome to the Ingwine Heathenship space. "
+        "This server is for people who are interested in practicing Ingwine "
+        "Heathenship. It is not a place for people from other religious "
+        "traditions to \"observe\" us or satisfy their curiosity. "
+        "Introduce yourself here so we can get to know you a little better "
+        "before granting you access to the rest of the rooms.\n\n"
+        "Learn more about our tradition at https://ingwine.org/"
+    )
+
+    if welcome_room_name:
+        @bot.listener.on_custom_event(RoomMemberEvent)
+        async def on_member(room, event):
+            if (
+                event.membership == "join"
+                and event.prev_membership != "join"
+                and room.display_name == welcome_room_name
+            ):
+                user = event.state_key
+                log.info("New join in %s: %s", welcome_room_name, user)
+                msg = f"{user}: {WELCOME_MSG}"
+                await bot.api.send_markdown_message(room.room_id, msg)
 
     bot.run()

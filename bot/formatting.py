@@ -4,7 +4,7 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from ascal.eclipses import EclipseInfo
-from ascal.types import AngloSaxonDate, MoonInfo, TideInfo, YearCalendar
+from ascal.types import AngloSaxonDate, MoonInfo, SunInfo, TideInfo, YearCalendar
 
 
 def format_today(asd: AngloSaxonDate, timezone: str) -> str:
@@ -121,6 +121,32 @@ def format_as_date(asd: AngloSaxonDate) -> str:
     return "\n".join(lines)
 
 
+def format_sun(sun: SunInfo) -> str:
+    if sun.altitude <= 0:
+        return (
+            f"**The sun is below the horizon**\n\n"
+            f"Altitude: {sun.altitude}\u00b0\n"
+            f"Azimuth: {sun.azimuth}\u00b0"
+        )
+    lines = [
+        f"**Sun Position**",
+        "",
+        f"Altitude: {sun.altitude}\u00b0 above horizon",
+        f"Azimuth: {sun.azimuth}\u00b0 ({_az_to_compass(sun.azimuth)})",
+        f"Shadow points: {sun.shadow_dir}",
+        f"Shadow length: {sun.shadow_ratio}\u00d7 object height",
+    ]
+    return "\n".join(lines)
+
+
+def _az_to_compass(az: float) -> str:
+    points = [
+        "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+        "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
+    ]
+    return points[int((az + 11.25) % 360 / 22.5)]
+
+
 def format_eclipses(eclipses: list[EclipseInfo]) -> str:
     if not eclipses:
         return "No upcoming eclipses found."
@@ -144,7 +170,9 @@ def format_help(prefix: str) -> str:
         f"`{prefix}nexttides` — All 8 tides starting from the upcoming sunset\n"
         f"`{prefix}moon` — Current moon phase and upcoming phases\n"
         f"`{prefix}date YYYY-MM-DD` — Convert a Gregorian date to AS\n"
+        f"`{prefix}sun` — Current sun position, shadow direction and length\n"
         f"`{prefix}eclipses` — Upcoming lunar and solar eclipses\n"
+        f"`{prefix}timefact` — Random fact about Germanic/Celtic ethnoastronomy\n"
         f"`{prefix}holidays` — The four major holidays\n"
         f"`{prefix}location City, State` — Set your location for local sunrise/sunset/tides\n"
         f"`{prefix}location` — Show your current location\n"

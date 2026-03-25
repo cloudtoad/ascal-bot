@@ -36,6 +36,14 @@ class MoonInfo:
 
 
 @dataclass
+class SunInfo:
+    altitude: float  # degrees above horizon
+    azimuth: float  # degrees from north
+    shadow_dir: str  # compass direction the shadow points
+    shadow_ratio: float | None  # shadow length / object height (None if sun below horizon)
+
+
+@dataclass
 class TideInfo:
     name: str
     starts: time
