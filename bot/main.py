@@ -26,6 +26,7 @@ from bot.formatting import (
     format_tomorrow,
 )
 from bot.user_settings import geocode_location, get_user_location, set_user_location
+from bot.moderation import register_moderation
 
 log = logging.getLogger(__name__)
 
@@ -267,5 +268,7 @@ def run_bot(config: dict) -> None:
                 log.info("New join in %s: %s", welcome_room_name, user)
                 msg = f"{user}: {WELCOME_MSG}"
                 await bot.api.send_markdown_message(room.room_id, msg)
+
+    register_moderation(bot, config)
 
     bot.run()

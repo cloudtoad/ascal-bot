@@ -12,3 +12,19 @@ timezone = "Europe/London"
 [bot]
 prefix = "!"
 # welcome_room = "Campfire"  # room name where new joins get a welcome message
+
+[moderation]
+enabled = false  # set to true to activate
+
+# Room IDs (not names) — find in Element: Room Settings → Advanced
+mod_room_id = "!yourModRoomId:matrix.org"
+protected_rooms = [
+  "!leechdomRoomId:matrix.org",
+]
+
+# How many clean messages before a user is considered trusted
+new_user_threshold = 5
+
+# Anthropic API key for text analysis
+anthropic_api_key = "sk-ant-..."
+
