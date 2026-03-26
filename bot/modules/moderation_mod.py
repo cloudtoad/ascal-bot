@@ -339,8 +339,21 @@ class ModerationModule:
             return
 
         # Check if first arg looks like a Matrix user ID
-        if ctx.args[0].startswith("@") and ":" in ctx.args[0]:
-            await self._analyze_user(ctx, ctx.args[0])
+        target_user = None
+        first_arg = ctx.args[0]
+        if first_arg.startswith("@") and ":" in first_arg:
+            target_user = first_arg
+        else:
+            # Check for a user pill in formatted_body (Element sends mentions as display
+            # names in body but full Matrix IDs in formatted_body via HTML pills)
+            pill_match = re.search(
+                r'https://matrix\.to/#/(@[^"&]+:[^"&]+)', ctx.formatted_body
+            )
+            if pill_match:
+                target_user = pill_match.group(1)
+
+        if target_user:
+            await self._analyze_user(ctx, target_user)
         else:
             text = " ".join(ctx.args)
             flagged, reason = await _analyze(text, "unknown")

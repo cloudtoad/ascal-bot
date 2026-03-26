@@ -155,6 +155,7 @@ class Dispatcher:
             command=canonical,
             args=args,
             raw_body=body,
+            formatted_body=getattr(event, "formatted_body", "") or "",
             event_id=event.event_id,
             _messenger=self._messenger,
         )

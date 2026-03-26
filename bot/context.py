@@ -24,6 +24,7 @@ class CommandContext:
     command: str
     args: list[str]
     raw_body: str
+    formatted_body: str
     event_id: str
     _messenger: Messenger
 
