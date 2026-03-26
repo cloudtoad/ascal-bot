@@ -301,25 +301,97 @@ class ModerationModule:
     # ── Analyze command ───────────────────────────────────────────────────
 
     async def _cmd_analyze(self, ctx: CommandContext) -> None:
-        """Run moderation analysis on provided text. Works in mod room or DMs."""
-        # Only allow in mod room or DMs (rooms with 2 members)
+        """Run moderation analysis. Works in mod room or DMs.
+
+        Usage:
+            !analyze @user:server     — pull recent messages and analyze
+            !analyze some text here   — analyze the provided text directly
+        """
         room = self._client.rooms.get(ctx.room_id)
         is_dm = room and room.member_count <= 2
         is_mod_room = ctx.room_id == self._mod_room_id
 
         if not (is_dm or is_mod_room):
-            return  # silently ignore in other rooms
-
-        text = " ".join(ctx.args)
-        if not text:
-            await ctx.respond("Usage: `!analyze <text to check>`")
             return
 
-        flagged, reason = await _analyze(text, ctx.sender)
-        if flagged:
-            await ctx.respond(f"**FLAGGED**: {reason}")
+        if not ctx.args:
+            await ctx.respond(
+                "Usage:\n"
+                "`!analyze @user:server` — analyze a user's recent messages\n"
+                "`!analyze some text here` — analyze text directly"
+            )
+            return
+
+        # Check if first arg looks like a Matrix user ID
+        if ctx.args[0].startswith("@") and ":" in ctx.args[0]:
+            await self._analyze_user(ctx, ctx.args[0])
         else:
-            await ctx.respond(f"**OK**: {reason}")
+            text = " ".join(ctx.args)
+            flagged, reason = await _analyze(text, "unknown")
+            if flagged:
+                await ctx.respond(f"**FLAGGED**: {reason}")
+            else:
+                await ctx.respond(f"**OK**: {reason}")
+
+    async def _analyze_user(self, ctx: CommandContext, target_user: str) -> None:
+        """Pull a user's recent messages from protected rooms and analyze each."""
+        from nio import RoomMessagesResponse
+
+        await ctx.respond(f"Scanning recent messages from **{target_user}**...")
+
+        messages_found = []
+
+        for room_id in self._protected_rooms:
+            room = self._client.rooms.get(room_id)
+            if room is None:
+                continue
+
+            # Get the room's prev_batch token for pagination
+            start_token = room.prev_batch
+            if not start_token:
+                continue
+
+            resp = await self._client.room_messages(
+                room_id, start=start_token, limit=100,
+            )
+            if not isinstance(resp, RoomMessagesResponse):
+                continue
+
+            for event in resp.chunk:
+                if getattr(event, "sender", None) != target_user:
+                    continue
+                body = getattr(event, "body", None)
+                if not body:
+                    continue
+                messages_found.append((room_id, body))
+
+        if not messages_found:
+            await ctx.respond(f"No recent text messages found from **{target_user}** in protected rooms.")
+            return
+
+        lines = [f"**Analysis of {target_user}** ({len(messages_found)} messages found)", ""]
+        flagged_count = 0
+
+        for room_id, body in messages_found[:20]:  # cap at 20 to avoid hammering claude
+            flagged, reason = await _analyze(body, target_user)
+            if flagged:
+                flagged_count += 1
+                lines.append(f"**FLAGGED**: {reason}")
+                lines.append(f"> {body[:200]}{'...' if len(body) > 200 else ''}")
+                lines.append("")
+            else:
+                lines.append(f"OK: {body[:100]}{'...' if len(body) > 100 else ''}")
+
+        lines.append("")
+        lines.append(f"**Summary**: {flagged_count}/{len(messages_found[:20])} flagged")
+
+        if flagged_count > 0:
+            lines.append("")
+            lines.append(f"**Commands:**")
+            lines.append(f"- `!mod ban {target_user}`")
+            lines.append(f"- `!mod trust {target_user}`")
+
+        await ctx.respond("\n".join(lines))
 
     # ── Alert formatting ─────────────────────────────────────────────────
 
