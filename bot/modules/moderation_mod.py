@@ -85,16 +85,22 @@ def _is_bare_link(event) -> bool:
 _ANALYSIS_PROMPT = (
     "You are a moderation assistant for Ingwine Heathenship, "
     "a Germanic heathen religious community on Matrix. "
-    "Analyze this message from a new (unverified) user.\n\n"
+    "Analyze this message from a new (unverified) user in the community's "
+    "public welcome channel.\n\n"
     "Reply with JSON only, no other text:\n"
     '{"flag": true/false, "assessment": "1-2 sentence assessment of the message '
     'tone, intent, and content. If the message seems fine, say what the user '
     'appears to be discussing or asking about."}\n\n'
-    "Flag: spam, hate speech, slurs used hatefully, targeted harassment, "
-    "promotional content (pills, crypto, adult services).\n"
-    "Do NOT flag: casual profanity in conversation, questions about "
-    "heathenry/Norse/Germanic topics, religious discussion, strong opinions. "
-    "When uncertain, do NOT flag — moderators handle edge cases.\n\n"
+    "ONLY flag OBVIOUS spam or abuse: pill/crypto/adult service promotions, "
+    "hate speech, slurs used hatefully, targeted harassment, bot-like behavior "
+    "(generic greetings with links, promotional copy).\n\n"
+    "Do NOT flag: links to videos, articles, or websites about history, "
+    "mythology, paganism, heathenry, Norse/Germanic/Celtic topics, music, art, "
+    "or any other benign content. Do NOT flag casual conversation, questions, "
+    "images, religious discussion, or strong opinions. A link that is irrelevant "
+    "but not spammy should NOT be flagged.\n\n"
+    "When uncertain, do NOT flag — err heavily on the side of not flagging. "
+    "Moderators handle edge cases.\n\n"
 )
 
 
@@ -236,27 +242,27 @@ class ModerationModule:
             _increment_count(self._state, room_id, sender)
             return
 
-        # ── New user checks ──────────────────────────────────────────────
+        # ── New user checks — all content goes through Claude ────────────
         flagged = False
         reason = ""
         auto_redact = False
 
+        body = getattr(message, "body", "") or ""
+        msgtype = getattr(message, "msgtype", None)
+
         if _is_media(message):
-            flagged = True
-            reason = "New user posted media before reaching trust threshold"
-            auto_redact = True
+            # Describe what was posted so Claude can assess it
+            desc = f"[Posted {msgtype} content]"
+            if body:
+                desc += f" with caption: {body}"
+            flagged, reason = await _analyze(desc, sender)
+            if flagged:
+                auto_redact = True
 
-        elif _is_bare_link(message):
-            flagged = True
-            reason = "New user posted bare link before reaching trust threshold"
-            auto_redact = True
-
-        elif getattr(message, "msgtype", None) == "m.text":
-            text = getattr(message, "body", "") or ""
-            if text:
-                flagged, reason = await _analyze(text, sender)
-                if flagged:
-                    auto_redact = True
+        elif body:
+            flagged, reason = await _analyze(body, sender)
+            if flagged:
+                auto_redact = True
 
         if flagged:
             if auto_redact:
