@@ -170,6 +170,8 @@ class ModerationModule:
 
         # Register !mod command (hidden from help)
         ctx.dispatcher.register_command("mod", self._cmd_mod)
+        ctx.dispatcher.register_command("analyze", self._cmd_analyze,
+                                        help_text="Run moderation analysis on text (mod/DM only)")
 
         log.info(
             "Moderation active — protecting %d room(s), threshold=%d, mod room=%s",
@@ -295,6 +297,29 @@ class ModerationModule:
         except Exception as exc:
             log.exception("Mod command error")
             await ctx.respond(f"Error: {exc}")
+
+    # ── Analyze command ───────────────────────────────────────────────────
+
+    async def _cmd_analyze(self, ctx: CommandContext) -> None:
+        """Run moderation analysis on provided text. Works in mod room or DMs."""
+        # Only allow in mod room or DMs (rooms with 2 members)
+        room = self._client.rooms.get(ctx.room_id)
+        is_dm = room and room.member_count <= 2
+        is_mod_room = ctx.room_id == self._mod_room_id
+
+        if not (is_dm or is_mod_room):
+            return  # silently ignore in other rooms
+
+        text = " ".join(ctx.args)
+        if not text:
+            await ctx.respond("Usage: `!analyze <text to check>`")
+            return
+
+        flagged, reason = await _analyze(text, ctx.sender)
+        if flagged:
+            await ctx.respond(f"**FLAGGED**: {reason}")
+        else:
+            await ctx.respond(f"**OK**: {reason}")
 
     # ── Alert formatting ─────────────────────────────────────────────────
 
