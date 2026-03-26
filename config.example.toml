@@ -25,8 +25,7 @@ protected_rooms = [
 # How many clean messages before a user is considered trusted
 new_user_threshold = 5
 
-# Anthropic API key for text analysis
-anthropic_api_key = "sk-ant-..."
+# Text analysis uses claude -p (requires Claude Code with CLAUDE_CODE_OAUTH_TOKEN set)
 
 [notifications]
 # Matrix user IDs to DM for bot alerts (errors, warnings, etc.)

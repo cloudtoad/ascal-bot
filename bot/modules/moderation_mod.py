@@ -21,7 +21,7 @@ import logging
 import re
 from pathlib import Path
 
-from anthropic import Anthropic
+import asyncio
 
 from bot.context import BotContext, CommandContext
 from bot.notifications import Alert, AlertLevel
@@ -82,35 +82,40 @@ def _is_bare_link(event) -> bool:
 
 # ── Claude analysis ──────────────────────────────────────────────────────────
 
-async def _analyze(anthropic_client: Anthropic, text: str, user_id: str) -> tuple[bool, str]:
-    """Return (should_flag, reason)."""
+_ANALYSIS_PROMPT = (
+    "You are a moderation assistant for Ingwine Heathenship, "
+    "a Germanic heathen religious community on Matrix. "
+    "Analyze this message from a new (unverified) user.\n\n"
+    "Reply with JSON only, no other text: "
+    '{"flag": true/false, "reason": "brief reason or ok"}\n\n'
+    "Flag: spam, hate speech, slurs used hatefully, targeted harassment, "
+    "promotional content (pills, crypto, adult services).\n"
+    "Do NOT flag: casual profanity in conversation, questions about "
+    "heathenry/Norse/Germanic topics, religious discussion, strong opinions. "
+    "When uncertain, do NOT flag — moderators handle edge cases.\n\n"
+)
+
+
+async def _analyze(text: str, user_id: str) -> tuple[bool, str]:
+    """Run text through claude -p for moderation analysis. Return (should_flag, reason)."""
+    prompt = f"{_ANALYSIS_PROMPT}User: {user_id}\nMessage: {text}"
     try:
-        response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=150,
-            messages=[
-                {
-                    "role": "user",
-                    "content": (
-                        "You are a moderation assistant for Ingwine Heathenship, "
-                        "a Germanic heathen religious community on Matrix. "
-                        "Analyze this message from a new (unverified) user.\n\n"
-                        "Reply with JSON only, no other text: "
-                        "{\"flag\": true/false, \"reason\": \"brief reason or ok\"}\n\n"
-                        "Flag: spam, hate speech, slurs used hatefully, targeted harassment, "
-                        "promotional content (pills, crypto, adult services).\n"
-                        "Do NOT flag: casual profanity in conversation, questions about "
-                        "heathenry/Norse/Germanic topics, religious discussion, strong opinions. "
-                        "When uncertain, do NOT flag — moderators handle edge cases.\n\n"
-                        f"User: {user_id}\n"
-                        f"Message: {text}"
-                    ),
-                }
-            ],
+        proc = await asyncio.create_subprocess_exec(
+            "claude", "-p", "--model", "haiku",
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
-        raw = response.content[0].text.strip()
+        stdout, stderr = await asyncio.wait_for(proc.communicate(prompt.encode()), timeout=30)
+        if proc.returncode != 0:
+            log.warning("claude -p failed (rc=%d): %s", proc.returncode, stderr.decode().strip())
+            return False, "analysis error — skipped"
+        raw = stdout.decode().strip()
         result = json.loads(raw)
         return bool(result.get("flag")), str(result.get("reason", "ok"))
+    except asyncio.TimeoutError:
+        log.warning("Claude analysis timed out")
+        return False, "analysis timeout — skipped"
     except Exception as exc:
         log.warning("Claude analysis failed: %s", exc)
         return False, "analysis error — skipped"
@@ -139,7 +144,6 @@ class ModerationModule:
         self._client = None
         self._messenger = None
         self._notifications = None
-        self._anthropic = None
         self._state: dict = {}
         self._mod_room_id: str = ""
         self._protected_rooms: list[str] = []
@@ -159,7 +163,6 @@ class ModerationModule:
         self._protected_rooms = mc.protected_rooms
         self._threshold = mc.new_user_threshold
         self._bot_user_id = ctx.client.user_id
-        self._anthropic = Anthropic(api_key=mc.anthropic_api_key)
         self._state = _load_state()
 
         # Register as raw message handler (sees ALL messages before command parsing)
@@ -222,7 +225,7 @@ class ModerationModule:
         elif getattr(message, "msgtype", None) == "m.text":
             text = getattr(message, "body", "") or ""
             if text:
-                flagged, reason = await _analyze(self._anthropic, text, sender)
+                flagged, reason = await _analyze(text, sender)
                 if flagged:
                     auto_redact = True
 

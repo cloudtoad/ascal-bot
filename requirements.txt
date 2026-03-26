@@ -4,4 +4,3 @@ pyephem
 astronomy-engine
 geopy
 timezonefinder
-anthropic

@@ -35,7 +35,6 @@ class ModerationConfig:
     mod_room_id: str = ""
     protected_rooms: list[str] = field(default_factory=list)
     new_user_threshold: int = 5
-    anthropic_api_key: str = ""
 
 
 @dataclass
@@ -104,7 +103,6 @@ def load_config(path: str) -> AppConfig:
         mod_room_id=mod.get("mod_room_id", ""),
         protected_rooms=mod.get("protected_rooms", []),
         new_user_threshold=int(mod.get("new_user_threshold", 5)),
-        anthropic_api_key=mod.get("anthropic_api_key", ""),
     )
 
     notifications = NotificationConfig(
