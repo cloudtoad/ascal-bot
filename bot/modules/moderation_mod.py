@@ -224,9 +224,11 @@ class ModerationModule:
         if sender == self._bot_user_id:
             return
 
-        # Only screen messages in the designated screening room
-        screening_id = self._get_screening_room_id()
-        if screening_id is None or room_id != screening_id:
+        # Skip mod room and DMs
+        if room_id == self._mod_room_id:
+            return
+        room_obj = self._client.rooms.get(room_id)
+        if room_obj and room_obj.member_count <= 2:
             return
 
         # Power level > 0 → always trusted
