@@ -33,7 +33,6 @@ class BotConfig:
 class ModerationConfig:
     enabled: bool = False
     mod_room_id: str = ""
-    protected_rooms: list[str] = field(default_factory=list)
     new_user_threshold: int = 5
 
 
@@ -101,7 +100,6 @@ def load_config(path: str) -> AppConfig:
     moderation = ModerationConfig(
         enabled=mod.get("enabled", False),
         mod_room_id=mod.get("mod_room_id", ""),
-        protected_rooms=mod.get("protected_rooms", []),
         new_user_threshold=int(mod.get("new_user_threshold", 5)),
     )
 

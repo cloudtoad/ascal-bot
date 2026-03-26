@@ -146,9 +146,19 @@ class ModerationModule:
         self._notifications = None
         self._state: dict = {}
         self._mod_room_id: str = ""
-        self._protected_rooms: list[str] = []
         self._threshold: int = 5
         self._bot_user_id: str = ""
+
+    def _get_protected_rooms(self) -> list[str]:
+        """All joined rooms except the mod room and DMs."""
+        protected = []
+        for room_id, room in self._client.rooms.items():
+            if room_id == self._mod_room_id:
+                continue
+            if room.member_count <= 2:
+                continue  # skip DMs
+            protected.append(room_id)
+        return protected
 
     async def setup(self, ctx: BotContext) -> None:
         mc = ctx.config.moderation
@@ -160,7 +170,6 @@ class ModerationModule:
         self._messenger = ctx.messenger
         self._notifications = ctx.notifications
         self._mod_room_id = mc.mod_room_id
-        self._protected_rooms = mc.protected_rooms
         self._threshold = mc.new_user_threshold
         self._bot_user_id = ctx.client.user_id
         self._state = _load_state()
@@ -174,10 +183,9 @@ class ModerationModule:
                                         help_text="Run moderation analysis on text (mod/DM only)")
 
         log.info(
-            "Moderation active — protecting %d room(s), threshold=%d, mod room=%s",
-            len(self._protected_rooms),
+            "Moderation active — protecting all joined rooms, threshold=%d, mod room=%s",
             self._threshold,
-            self._mod_room_id,
+            self._mod_room_id or "(none)",
         )
 
     async def teardown(self) -> None:
@@ -193,7 +201,7 @@ class ModerationModule:
             return
 
         # Protected room moderation
-        if room_id not in self._protected_rooms:
+        if room_id not in self._get_protected_rooms():
             return
 
         # Power level > 0 → always trusted
@@ -267,23 +275,23 @@ class ModerationModule:
 
         try:
             if command == "ban":
-                for pid in self._protected_rooms:
+                for pid in self._get_protected_rooms():
                     await self._client.room_ban(pid, target_user, reason="Banned via mod room")
                 await ctx.respond(f"Banned **{target_user}** from all protected rooms.")
 
             elif command == "kick":
-                kick_room = extra[0] if extra else self._protected_rooms[0]
+                kick_room = extra[0] if extra else self._get_protected_rooms()[0]
                 await self._client.room_kick(kick_room, target_user, reason="Kicked via mod room")
                 await ctx.respond(f"Kicked **{target_user}** from `{kick_room}`.")
 
             elif command == "trust":
-                for pid in self._protected_rooms:
+                for pid in self._get_protected_rooms():
                     _set_count(self._state, pid, target_user, self._threshold + 1)
                 await ctx.respond(f"**{target_user}** is now trusted in all protected rooms.")
 
             elif command == "status":
                 lines = [f"**Status for {target_user}:**"]
-                for pid in self._protected_rooms:
+                for pid in self._get_protected_rooms():
                     c = _get_count(self._state, pid, target_user)
                     trusted = "trusted" if c >= self._threshold else f"{c}/{self._threshold} messages"
                     lines.append(f"- `{pid}`: {trusted}")
@@ -341,7 +349,7 @@ class ModerationModule:
 
         messages_found = []
 
-        for room_id in self._protected_rooms:
+        for room_id in self._get_protected_rooms():
             room = self._client.rooms.get(room_id)
             if room is None:
                 continue
