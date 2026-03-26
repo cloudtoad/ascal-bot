@@ -370,16 +370,12 @@ class ModerationModule:
 
         messages_found = []
 
+        start_token = self._client.next_batch
+        if not start_token:
+            await ctx.respond("No sync token available — try again after the bot has been running a moment.")
+            return
+
         for room_id in self._get_protected_rooms():
-            room = self._client.rooms.get(room_id)
-            if room is None:
-                continue
-
-            # Get the room's prev_batch token for pagination
-            start_token = room.prev_batch
-            if not start_token:
-                continue
-
             resp = await self._client.room_messages(
                 room_id, start=start_token, limit=100,
             )
