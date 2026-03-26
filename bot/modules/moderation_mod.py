@@ -86,8 +86,10 @@ _ANALYSIS_PROMPT = (
     "You are a moderation assistant for Ingwine Heathenship, "
     "a Germanic heathen religious community on Matrix. "
     "Analyze this message from a new (unverified) user.\n\n"
-    "Reply with JSON only, no other text: "
-    '{"flag": true/false, "reason": "brief reason or ok"}\n\n'
+    "Reply with JSON only, no other text:\n"
+    '{"flag": true/false, "assessment": "1-2 sentence assessment of the message '
+    'tone, intent, and content. If the message seems fine, say what the user '
+    'appears to be discussing or asking about."}\n\n'
     "Flag: spam, hate speech, slurs used hatefully, targeted harassment, "
     "promotional content (pills, crypto, adult services).\n"
     "Do NOT flag: casual profanity in conversation, questions about "
@@ -101,7 +103,7 @@ async def _analyze(text: str, user_id: str) -> tuple[bool, str]:
     prompt = f"{_ANALYSIS_PROMPT}User: {user_id}\nMessage: {text}"
     try:
         proc = await asyncio.create_subprocess_exec(
-            "claude", "-p", "--model", "haiku",
+            "claude", "-p", "--model", "sonnet",
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -117,7 +119,8 @@ async def _analyze(text: str, user_id: str) -> tuple[bool, str]:
             raw = re.sub(r"\s*```$", "", raw)
             raw = raw.strip()
         result = json.loads(raw)
-        return bool(result.get("flag")), str(result.get("reason", "ok"))
+        assessment = result.get("assessment") or result.get("reason", "ok")
+        return bool(result.get("flag")), str(assessment)
     except asyncio.TimeoutError:
         log.warning("Claude analysis timed out")
         return False, "analysis timeout — skipped"
