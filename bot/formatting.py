@@ -4,6 +4,7 @@ from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from ascal.eclipses import EclipseInfo
+from ascal.holydays import HolyDay
 from ascal.types import AngloSaxonDate, MoonInfo, SunInfo, TideInfo, YearCalendar
 
 
@@ -65,15 +66,12 @@ def format_calendar(cal: YearCalendar) -> str:
     return "\n".join(lines)
 
 
-def format_holidays(cal: YearCalendar) -> str:
-    lines = [
-        f"**Holidays for {cal.year}**",
-        "",
-        f"Eosturd\u00e6g: {cal.easter}",
-        f"Midsumor: {cal.midsummer.strftime('%Y-%m-%d %H:%M')}",
-        f"Winterfylle\u00fe: {cal.winterfylleth}",
-        f"Yule: {cal.yule.strftime('%Y-%m-%d %H:%M')}",
-    ]
+def format_holidays(holydays: list[HolyDay], year: int) -> str:
+    lines = [f"**Holy Calendar for {year}**", ""]
+    for h in holydays:
+        lines.append(f"**{h.name_oe}** ({h.name_en}) — {h.date.strftime('%a %d %b')}")
+        lines.append(f"  {h.description}")
+        lines.append("")
     return "\n".join(lines)
 
 

@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 from ascal.calendar import AngloSaxonCalendar
 from ascal.eclipses import get_upcoming_eclipses
+from ascal.holydays import compute_holydays
 from bot.context import BotContext, CommandContext
 from bot.formatting import (
     format_as_date,
@@ -74,7 +75,7 @@ class CalendarModule:
         d.register_command("moon", self.cmd_moon, help_text="Current moon phase and upcoming phases")
         d.register_command("eclipses", self.cmd_eclipses, help_text="Upcoming lunar and solar eclipses")
         d.register_command("date", self.cmd_date, help_text="Convert a Gregorian date to AS (YYYY-MM-DD)")
-        d.register_command("holidays", self.cmd_holidays, help_text="The four major holidays")
+        d.register_command("holidays", self.cmd_holidays, help_text="Ingwine holy calendar for the current year")
         d.register_command("location", self.cmd_location, help_text="Set your location (City, State/Country)")
         d.register_command("timefact", self.cmd_timefact, help_text="Random fact about Germanic/Celtic ethnoastronomy")
         d.register_command("help", self.cmd_help, help_text="This help message")
@@ -181,7 +182,8 @@ class CalendarModule:
 
     async def cmd_holidays(self, ctx: CommandContext) -> None:
         asd = self._default_cal.get_today()
-        await ctx.respond(format_holidays(asd.year_calendar))
+        holydays = compute_holydays(asd.year_calendar)
+        await ctx.respond(format_holidays(holydays, asd.year_calendar.year))
 
     async def cmd_location(self, ctx: CommandContext) -> None:
         place = " ".join(ctx.args)
