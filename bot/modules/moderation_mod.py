@@ -111,6 +111,11 @@ async def _analyze(text: str, user_id: str) -> tuple[bool, str]:
             log.warning("claude -p failed (rc=%d): %s", proc.returncode, stderr.decode().strip())
             return False, "analysis error — skipped"
         raw = stdout.decode().strip()
+        # Strip markdown code fences if present
+        if raw.startswith("```"):
+            raw = re.sub(r"^```(?:json)?\s*", "", raw)
+            raw = re.sub(r"\s*```$", "", raw)
+            raw = raw.strip()
         result = json.loads(raw)
         return bool(result.get("flag")), str(result.get("reason", "ok"))
     except asyncio.TimeoutError:
