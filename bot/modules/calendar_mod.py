@@ -7,6 +7,8 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import unicodedata
+
 from ascal.calendar import AngloSaxonCalendar
 from ascal.eclipses import get_upcoming_eclipses
 from ascal.holydays import compute_holydays
@@ -75,6 +77,7 @@ class CalendarModule:
         d.register_command("moon", self.cmd_moon, help_text="Current moon phase and upcoming phases")
         d.register_command("eclipses", self.cmd_eclipses, help_text="Upcoming lunar and solar eclipses")
         d.register_command("date", self.cmd_date, help_text="Convert a Gregorian date to AS (YYYY-MM-DD)")
+        d.register_command("asdate", self.cmd_asdate, help_text="Convert an AS date to Gregorian (MonthName Day [Year])")
         d.register_command("holidays", self.cmd_holidays, help_text="Ingwine holy calendar for the current year")
         d.register_command("location", self.cmd_location, help_text="Set your location (City, State/Country)")
         d.register_command("timefact", self.cmd_timefact, help_text="Random fact about Germanic/Celtic ethnoastronomy")
@@ -179,6 +182,62 @@ class CalendarModule:
             return
         asd = self._default_cal.get_date(d)
         await ctx.respond(format_as_date(asd))
+
+    @staticmethod
+    def _normalize_month(name: str) -> str:
+        """Strip diacritics and lowercase for fuzzy month matching."""
+        # Decompose unicode, drop combining marks, lowercase
+        nfkd = unicodedata.normalize("NFKD", name)
+        stripped = "".join(c for c in nfkd if not unicodedata.combining(c))
+        # Replace ð/þ with their ASCII equivalents
+        stripped = stripped.replace("ð", "th").replace("Ð", "th")
+        stripped = stripped.replace("þ", "th").replace("Þ", "th")
+        stripped = stripped.replace("æ", "ae").replace("Æ", "ae")
+        return stripped.lower().strip()
+
+    def _find_month_by_name(self, cal_months, name: str):
+        """Find a month by fuzzy name match."""
+        target = self._normalize_month(name)
+        for m in cal_months:
+            if self._normalize_month(m.name) == target:
+                return m
+            # Also try without -monath suffix
+            if target in self._normalize_month(m.name):
+                return m
+        return None
+
+    async def cmd_asdate(self, ctx: CommandContext) -> None:
+        if len(ctx.args) < 2:
+            await ctx.respond(
+                f"Usage: `{self._prefix}asdate MonthName Day [Year]`\n"
+                f"Example: `{self._prefix}asdate Hrethmonath 4` or "
+                f"`{self._prefix}asdate Hrethmonath 4 2027`"
+            )
+            return
+
+        month_name = ctx.args[0]
+        try:
+            day_num = int(ctx.args[1])
+        except ValueError:
+            await ctx.respond("Day must be a number.")
+            return
+
+        year = int(ctx.args[2]) if len(ctx.args) > 2 else datetime.now(ZoneInfo(self._default_tz)).year
+        cal = self._default_cal.get_year_calendar(year)
+        month = self._find_month_by_name(cal.months, month_name)
+
+        if month is None:
+            names = ", ".join(m.name for m in cal.months)
+            await ctx.respond(f"Could not find month \"{month_name}\". Available: {names}")
+            return
+
+        greg_date = month.begins + timedelta(days=day_num)
+        asd = self._default_cal.get_date(greg_date)
+        await ctx.respond(
+            f"Day {day_num} of {month.name} ({year}) = "
+            f"**{greg_date.strftime('%A, %d %B %Y')}**\n"
+            f"{asd.weekday_oe}"
+        )
 
     async def cmd_holidays(self, ctx: CommandContext) -> None:
         asd = self._default_cal.get_today()
