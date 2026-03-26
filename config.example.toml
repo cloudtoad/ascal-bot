@@ -16,8 +16,8 @@ prefix = "!"
 [moderation]
 enabled = false  # set to true to activate
 
-# All joined rooms are automatically protected (except the mod room and DMs)
 # mod_room_id = "!yourModRoomId:matrix.org"  # optional: dedicated mod room for alerts
+screening_room = "Campfire Chat"  # room display name where new users are screened
 
 # How many clean messages before a user is considered trusted
 new_user_threshold = 5

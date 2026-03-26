@@ -154,19 +154,27 @@ class ModerationModule:
         self._notifications = None
         self._state: dict = {}
         self._mod_room_id: str = ""
+        self._screening_room_name: str = ""
         self._threshold: int = 5
         self._bot_user_id: str = ""
 
-    def _get_protected_rooms(self) -> list[str]:
-        """All joined rooms except the mod room and DMs."""
-        protected = []
+    def _get_screening_room_id(self) -> str | None:
+        """Find the screening room by display name."""
+        for room_id, room in self._client.rooms.items():
+            if room.display_name == self._screening_room_name:
+                return room_id
+        return None
+
+    def _get_all_rooms(self) -> list[str]:
+        """All joined rooms except the mod room and DMs. Used for ban/kick."""
+        rooms = []
         for room_id, room in self._client.rooms.items():
             if room_id == self._mod_room_id:
                 continue
             if room.member_count <= 2:
-                continue  # skip DMs
-            protected.append(room_id)
-        return protected
+                continue
+            rooms.append(room_id)
+        return rooms
 
     async def setup(self, ctx: BotContext) -> None:
         mc = ctx.config.moderation
@@ -178,6 +186,7 @@ class ModerationModule:
         self._messenger = ctx.messenger
         self._notifications = ctx.notifications
         self._mod_room_id = mc.mod_room_id
+        self._screening_room_name = mc.screening_room
         self._threshold = mc.new_user_threshold
         self._bot_user_id = ctx.client.user_id
         self._state = _load_state()
@@ -191,7 +200,8 @@ class ModerationModule:
                                         help_text="Run moderation analysis on text (mod/DM only)")
 
         log.info(
-            "Moderation active — protecting all joined rooms, threshold=%d, mod room=%s",
+            "Moderation active — screening room='%s', threshold=%d, mod room=%s",
+            self._screening_room_name or "(all rooms)",
             self._threshold,
             self._mod_room_id or "(none)",
         )
@@ -208,8 +218,9 @@ class ModerationModule:
         if sender == self._bot_user_id:
             return
 
-        # Protected room moderation
-        if room_id not in self._get_protected_rooms():
+        # Only screen messages in the designated screening room
+        screening_id = self._get_screening_room_id()
+        if screening_id is None or room_id != screening_id:
             return
 
         # Power level > 0 → always trusted
@@ -283,23 +294,23 @@ class ModerationModule:
 
         try:
             if command == "ban":
-                for pid in self._get_protected_rooms():
+                for pid in self._get_all_rooms():
                     await self._client.room_ban(pid, target_user, reason="Banned via mod room")
                 await ctx.respond(f"Banned **{target_user}** from all protected rooms.")
 
             elif command == "kick":
-                kick_room = extra[0] if extra else self._get_protected_rooms()[0]
+                kick_room = extra[0] if extra else self._get_all_rooms()[0]
                 await self._client.room_kick(kick_room, target_user, reason="Kicked via mod room")
                 await ctx.respond(f"Kicked **{target_user}** from `{kick_room}`.")
 
             elif command == "trust":
-                for pid in self._get_protected_rooms():
+                for pid in self._get_all_rooms():
                     _set_count(self._state, pid, target_user, self._threshold + 1)
                 await ctx.respond(f"**{target_user}** is now trusted in all protected rooms.")
 
             elif command == "status":
                 lines = [f"**Status for {target_user}:**"]
-                for pid in self._get_protected_rooms():
+                for pid in self._get_all_rooms():
                     c = _get_count(self._state, pid, target_user)
                     trusted = "trusted" if c >= self._threshold else f"{c}/{self._threshold} messages"
                     lines.append(f"- `{pid}`: {trusted}")
@@ -375,7 +386,7 @@ class ModerationModule:
             await ctx.respond("No sync token available — try again after the bot has been running a moment.")
             return
 
-        for room_id in self._get_protected_rooms():
+        for room_id in self._get_all_rooms():
             resp = await self._client.room_messages(
                 room_id, start=start_token, limit=100,
             )

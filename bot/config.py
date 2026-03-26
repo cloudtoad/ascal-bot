@@ -33,6 +33,7 @@ class BotConfig:
 class ModerationConfig:
     enabled: bool = False
     mod_room_id: str = ""
+    screening_room: str = ""  # room display name where new users are screened
     new_user_threshold: int = 5
 
 
@@ -100,6 +101,7 @@ def load_config(path: str) -> AppConfig:
     moderation = ModerationConfig(
         enabled=mod.get("enabled", False),
         mod_room_id=mod.get("mod_room_id", ""),
+        screening_room=mod.get("screening_room", ""),
         new_user_threshold=int(mod.get("new_user_threshold", 5)),
     )
 
