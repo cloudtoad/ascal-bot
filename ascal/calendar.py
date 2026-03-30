@@ -246,7 +246,7 @@ class AngloSaxonCalendar:
 
         The AS day runs from sunset on *sunset_date* through the following
         sunrise and daylight to the next sunset.  Order:
-        Æfen, Niht, Midniht, Uhta, Morgen, Undern, Middæg, Gelotendæg.
+        Æfen, Niht, Midniht, Uhta, Morgen, Undern, Middæg, Ofer Midne Dæg.
         """
         next_day = sunset_date + timedelta(days=1)
         sunset = self.get_sunset_time(sunset_date)
@@ -279,7 +279,7 @@ class AngloSaxonCalendar:
             ("Morgen",     sunrise_s,               sunrise_s + day_q),
             ("Undern",     sunrise_s + day_q,       sunrise_s + 2 * day_q),
             ("Middæg",     sunrise_s + 2 * day_q,   sunrise_s + 3 * day_q),
-            ("Gelotendæg", sunrise_s + 3 * day_q,   next_sunset_s),
+            ("Ofer Midne Dæg", sunrise_s + 3 * day_q,   next_sunset_s),
         ]
 
         return [
