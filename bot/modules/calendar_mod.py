@@ -88,25 +88,26 @@ class CalendarModule:
 
     # ── Helpers ───────────────────────────────────────────────────────────
 
-    def _get_local_observer(self, user_id: str) -> tuple[AngloSaxonCalendar | None, str]:
+    def _get_local_observer(self, user_id: str) -> tuple[AngloSaxonCalendar | None, str, str]:
+        """Return (observer_or_None, timezone, tide_lang) for a user."""
         loc = get_user_location(user_id)
         if loc is None:
-            return None, self._default_tz
+            return None, self._default_tz, "oe"
         return AngloSaxonCalendar(
             latitude=loc["latitude"],
             longitude=loc["longitude"],
             timezone=loc["timezone"],
-        ), loc["timezone"]
+        ), loc["timezone"], loc.get("tide_lang", "oe")
 
     # ── Commands ──────────────────────────────────────────────────────────
 
     async def cmd_today(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, tide_lang = self._get_local_observer(ctx.sender)
         asd = self._default_cal.get_today(local_observer=obs)
-        await ctx.respond(format_today(asd, tz))
+        await ctx.respond(format_today(asd, tz, tide_lang))
 
     async def cmd_tomorrow(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, _tide_lang = self._get_local_observer(ctx.sender)
         tomorrow = datetime.now(ZoneInfo(tz)).date() + timedelta(days=1)
         asd = self._default_cal.get_date(tomorrow)
         if obs:
@@ -124,7 +125,7 @@ class CalendarModule:
         await ctx.respond(format_calendar(asd.year_calendar))
 
     async def cmd_tides(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, tide_lang = self._get_local_observer(ctx.sender)
         cal = obs or self._default_cal
         now = datetime.now(ZoneInfo(tz))
         sunset = cal.get_sunset_time(now.date())
@@ -134,10 +135,10 @@ class CalendarModule:
             sunset_date = now.date() - timedelta(days=1)
         tides = cal.get_as_day_tides(sunset_date)
         current = cal.get_current_tide(now)
-        await ctx.respond(format_tides(tides, current, f"Tides for the current AS day ({tz})"))
+        await ctx.respond(format_tides(tides, current, f"Tides for the current AS day ({tz})", tide_lang))
 
     async def cmd_nexttides(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, tide_lang = self._get_local_observer(ctx.sender)
         cal = obs or self._default_cal
         now = datetime.now(ZoneInfo(tz))
         sunset = cal.get_sunset_time(now.date())
@@ -147,22 +148,22 @@ class CalendarModule:
             sunset_date = now.date()
         tides = cal.get_as_day_tides(sunset_date)
         current = cal.get_current_tide(now)
-        await ctx.respond(format_tides(tides, current, f"Tides starting next sunset ({tz})"))
+        await ctx.respond(format_tides(tides, current, f"Tides starting next sunset ({tz})", tide_lang))
 
     async def cmd_sun(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, _tide_lang = self._get_local_observer(ctx.sender)
         cal = obs or self._default_cal
         sun = cal.get_sun_info()
         await ctx.respond(format_sun(sun))
 
     async def cmd_moon(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, _tide_lang = self._get_local_observer(ctx.sender)
         cal = obs or self._default_cal
         moon = cal.get_moon_info()
         await ctx.respond(format_moon(moon))
 
     async def cmd_eclipses(self, ctx: CommandContext) -> None:
-        obs, tz = self._get_local_observer(ctx.sender)
+        obs, tz, _tide_lang = self._get_local_observer(ctx.sender)
         cal = obs or self._default_cal
         eclipses = get_upcoming_eclipses(
             ZoneInfo(tz),
@@ -261,9 +262,11 @@ class CalendarModule:
         if result is None:
             await ctx.respond(f"Could not find a location matching \"{place}\".")
             return
-        display_name, lat, lon, tz = result
-        set_user_location(ctx.sender, lat, lon, tz, display_name)
-        await ctx.respond(f"Location set to **{display_name}** ({tz})")
+        display_name, lat, lon, tz, tide_lang = result
+        set_user_location(ctx.sender, lat, lon, tz, display_name, tide_lang)
+        from bot.tide_names import LANG_DISPLAY_NAMES
+        lang_name = LANG_DISPLAY_NAMES.get(tide_lang, tide_lang)
+        await ctx.respond(f"Location set to **{display_name}** ({tz})\nTide names: {lang_name}")
 
     async def cmd_timefact(self, ctx: CommandContext) -> None:
         if self._timefacts:

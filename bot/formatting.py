@@ -6,18 +6,20 @@ from zoneinfo import ZoneInfo
 from ascal.eclipses import EclipseInfo
 from ascal.holydays import HolyDay
 from ascal.types import AngloSaxonDate, MoonInfo, SunInfo, TideInfo, YearCalendar
+from bot.tide_names import translate_tide
 
 
-def format_today(asd: AngloSaxonDate, timezone: str) -> str:
+def format_today(asd: AngloSaxonDate, timezone: str, tide_lang: str = "oe") -> str:
     tz = ZoneInfo(timezone)
     now = datetime.now(tz)
     tide = asd.current_tide
+    tide_display = translate_tide(tide.name, tide_lang)
     lines = [
         f"**{asd.weekday_oe}, day {asd.day_number} of {asd.month_name}**",
         "",
         f"Modern date: {asd.gregorian.strftime('%A, %d %B %Y')}",
         f"Local time: {now.strftime('%H:%M')} ({timezone})",
-        f"Current tide: **{tide.name}** ({tide.starts.strftime('%H:%M')}\u2013{tide.ends.strftime('%H:%M')})",
+        f"Current tide: **{tide_display}** ({tide.starts.strftime('%H:%M')}\u2013{tide.ends.strftime('%H:%M')})",
         f"First light: {asd.first_light.strftime('%H:%M')}",
         f"Sunrise: {asd.sunrise_time.strftime('%H:%M')}",
         f"Sunset: {asd.sunset_time.strftime('%H:%M')}",
@@ -82,13 +84,14 @@ def _tide_duration(tide: TideInfo) -> str:
     return f"{diff // 60}:{diff % 60:02d}"
 
 
-def format_tides(tides: list[TideInfo], current_tide: TideInfo, label: str) -> str:
+def format_tides(tides: list[TideInfo], current_tide: TideInfo, label: str, tide_lang: str = "oe") -> str:
     lines = [f"**{label}**", ""]
     for tide in tides:
         marker = " **\u25c0**" if tide.name == current_tide.name else ""
         dur = _tide_duration(tide)
+        display = translate_tide(tide.name, tide_lang)
         lines.append(
-            f"{tide.name}: {tide.starts.strftime('%H:%M')}\u2013{tide.ends.strftime('%H:%M')} ({dur}){marker}"
+            f"{display}: {tide.starts.strftime('%H:%M')}\u2013{tide.ends.strftime('%H:%M')} ({dur}){marker}"
         )
     return "\n".join(lines)
 
